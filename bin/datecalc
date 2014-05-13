@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use App::datecalc;
+use Term::ReadLine;
+
+# VERSION
+# DATE
+
+my $calc = App::datecalc->new;
+
+my $term = Term::ReadLine->new('datecalc');
+my $prompt = "> ";
+my $OUT = $term->OUT || \*STDOUT;
+
+while ( defined ($_ = $term->readline($prompt)) ) {
+    my $res;
+    eval { $res = $calc->eval($_) };
+    if ($@) {
+        warn "Error: $@\n";
+    } else {
+        print $OUT $res, "\n";
+    }
+    $term->addhistory($_) if /\S/;
+}
+
+# ABSTRACT: Date arithmetics
+# PODNAME: datecalc
+
+=head1 SYNOPSIS
+
+ % datecalc
+ > 2014-05-13 + 2 days
+ 2014-05-15
+
+
+=head1 DESCRIPTION
+
+This is a command-line utility to perform date arithmetics.
+
+For now, for more details, see L<App::datecalc>.
+
