@@ -23,18 +23,23 @@ answer               ::= date_expr
 
 date_expr            ::= date_add
 
-date_add             ::= date_literal
+date_add             ::= date_term
                        | date_add op_plusminus duration_term
 op_plusminus         ::= [+-]
 
 date_term            ::= date_literal
-                       | '(' date_expr ')'                      action=>date_parenthesis
+#                       | date_variable
+                       | '(' date_expr ')'                            action=>date_parenthesis
 
-date_literal         ::= [\d][\d][\d][\d]-[\d][\d]-[\d][\d]     action=>dlit_isodate
-                       | 'now'                                  action=>dlit_special
-                       | 'today'                                action=>dlit_special
-                       | 'yesterday'                            action=>dlit_special
-                       | 'tommorow'                             action=>dlit_special
+date_literal         ::= [\d][\d][\d][\d] '-' [\d][\d] '-' [\d][\d]   action=>datelit_isodate
+                       | 'now'                                        action=>datelit_special
+                       | 'today'                                      action=>datelit_special
+                       | 'yesterday'                                  action=>datelit_special
+                       | 'tommorow'                                   action=>datelit_special
+
+duration_term        ::= duration_literal
+#                       | duration_variable
+                       | '(' duration_expr ')'
 
 duration_literal     ::= nat_duration_literal
                        | iso_duration_literal
@@ -47,15 +52,56 @@ unit_hour              ~ 'hour' | 'hours' | 'h'
 unit_minute            ~ 'minute' | 'minutes' | 'min' | 'mins'
 unit_second            ~ 'second' | 'seconds' | 'sec' | 'secs' | 's'
 
-ndl_year               ~ num (opt_ws) unit_year
-ndl_month              ~ num (opt_ws) unit_month
-ndl_week               ~ num (opt_ws) unit_week
-ndl_day                ~ num (opt_ws) unit_day
-ndl_hour               ~ num (opt_ws) unit_hour
-ndl_minute             ~ num (opt_ws) unit_minute
-ndl_second             ~ num (opt_ws) unit_second
+ndl_year               ~ num ws_opt unit_year
+ndl_month              ~ num ws_opt unit_month
+ndl_week               ~ num ws_opt unit_week
+ndl_day                ~ num ws_opt unit_day
+ndl_hour               ~ num ws_opt unit_hour
+ndl_minute             ~ num ws_opt unit_minute
+ndl_second             ~ num ws_opt unit_second
 
-nat_duration         ::=
+ndl_year_opt           ~ ndl_year
+ndl_year_opt           ~
+ndl_month_opt          ~ ndl_month
+ndl_month_opt          ~
+ndl_week_opt           ~ ndl_week
+ndl_week_opt           ~
+ndl_day_opt            ~ ndl_day
+ndl_day_opt            ~
+ndl_hour_opt           ~ ndl_hour
+ndl_hour_opt           ~
+ndl_minute_opt         ~ ndl_minute
+ndl_minute_opt         ~
+ndl_second_opt         ~ ndl_second
+ndl_second_opt         ~
+
+# need at least one element specified. XXX not happy with this
+nat_duration_literal ::= ndl_year     ndl_month_opt ndl_week_opt ndl_day_opt ndl_hour_opt ndl_minute_opt ndl_second_opt
+                       | ndl_year_opt ndl_month     ndl_week_opt ndl_day_opt ndl_hour_opt ndl_minute_opt ndl_second_opt
+                       | ndl_year_opt ndl_month_opt ndl_week     ndl_day_opt ndl_hour_opt ndl_minute_opt ndl_second_opt
+                       | ndl_year_opt ndl_month_opt ndl_week_opt ndl_day     ndl_hour_opt ndl_minute_opt ndl_second_opt
+                       | ndl_year_opt ndl_month_opt ndl_week_opt ndl_day_opt ndl_hour     ndl_minute_opt ndl_second_opt
+                       | ndl_year_opt ndl_month_opt ndl_week_opt ndl_day_opt ndl_hour_opt ndl_minute     ndl_second_opt
+                       | ndl_year_opt ndl_month_opt ndl_week_opt ndl_day_opt ndl_hour_opt ndl_minute_opt ndl_second
+
+idl_year_opt           ~ posnum 'Y'
+idl_year_opt           ~
+idl_month_opt          ~ posnum 'M'
+idl_month_opt          ~
+idl_week_opt           ~ posnum 'W'
+idl_week_opt           ~
+idl_day_opt            ~ posnum 'D'
+idl_day_opt            ~
+idl_hour_opt           ~ posnum 'H'
+idl_hour_opt           ~
+idl_minute_opt         ~ posnum 'M'
+idl_minute_opt         ~
+idl_second_opt         ~ posnum 'S'
+idl_second_opt         ~
+
+# also need at least one element specified like in nat_duration_literal?
+iso_duration_literal ::= 'P' idl_year_opt idl_month_opt idl_week_opt idl_day_opt
+                       | 'P' idl_year_opt idl_month_opt idl_week_opt idl_day_opt 'T' idl_hour_opt idl_minute_opt idl_second_opt
 
 sign                   ~ [+-]
 digits                 ~ [\d]+
@@ -63,21 +109,24 @@ num                    ~ digits
                        | sign digits
                        | digits '.' digits
                        | sign digits '.' digits
-# TODO: support exponent notation 1.2e3
+posnum                 ~ digits
+                       | digits '.' digits
+# TODO: support exponent notation 1.2e3?
 
 :discard               ~ ws
 ws                     ~ [\s]+
-opt_ws                 ~ [\s]*
+ws_opt                 ~ [\s]*
 
 _
         actions => {
-            today => sub {
+            datelit_now => sub {
+            },
+            datelit_today => sub {
                 my $hash = shift;
-
             },
-            tommorow => sub {
+            datelit_tommorow => sub {
             },
-            tommorow => sub {
+            datelit_yesterday => sub {
             },
         },
     );
