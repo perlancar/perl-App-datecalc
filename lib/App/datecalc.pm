@@ -39,7 +39,7 @@ date_literal         ::= [\d][\d][\d][\d] '-' [\d][\d] '-' [\d][\d]   action=>da
 
 duration_term        ::= duration_literal
 #                       | duration_variable
-                       | '(' duration_expr ')'
+#                       | '(' duration_expr ')'
 
 duration_literal     ::= nat_duration_literal
                        | iso_duration_literal
@@ -53,26 +53,31 @@ unit_minute            ~ 'minute' | 'minutes' | 'min' | 'mins'
 unit_second            ~ 'second' | 'seconds' | 'sec' | 'secs' | 's'
 
 ndl_year               ~ num ws_opt unit_year
-ndl_month              ~ num ws_opt unit_month
-ndl_week               ~ num ws_opt unit_week
-ndl_day                ~ num ws_opt unit_day
-ndl_hour               ~ num ws_opt unit_hour
-ndl_minute             ~ num ws_opt unit_minute
-ndl_second             ~ num ws_opt unit_second
-
-ndl_year_opt           ~ ndl_year
+ndl_year_opt           ~ num ws_opt unit_year
 ndl_year_opt           ~
-ndl_month_opt          ~ ndl_month
+
+ndl_month              ~ num ws_opt unit_month
+ndl_month_opt          ~ num ws_opt unit_month
 ndl_month_opt          ~
-ndl_week_opt           ~ ndl_week
+
+ndl_week               ~ num ws_opt unit_week
+ndl_week_opt           ~ num ws_opt unit_week
 ndl_week_opt           ~
-ndl_day_opt            ~ ndl_day
+
+ndl_day                ~ num ws_opt unit_day
+ndl_day_opt            ~ num ws_opt unit_day
 ndl_day_opt            ~
-ndl_hour_opt           ~ ndl_hour
+
+ndl_hour               ~ num ws_opt unit_hour
+ndl_hour_opt           ~ num ws_opt unit_hour
 ndl_hour_opt           ~
-ndl_minute_opt         ~ ndl_minute
+
+ndl_minute             ~ num ws_opt unit_minute
+ndl_minute_opt         ~ num ws_opt unit_minute
 ndl_minute_opt         ~
-ndl_second_opt         ~ ndl_second
+
+ndl_second             ~ num ws_opt unit_second
+ndl_second_opt         ~ num ws_opt unit_second
 ndl_second_opt         ~
 
 # need at least one element specified. XXX not happy with this
