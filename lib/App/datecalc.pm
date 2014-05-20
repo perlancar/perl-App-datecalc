@@ -323,7 +323,7 @@ sub eval {
 }
 
 1;
-#ABSTRACT: Date arithmetics
+#ABSTRACT: Date calculations
 
 =head1 SYNOPSIS
 
