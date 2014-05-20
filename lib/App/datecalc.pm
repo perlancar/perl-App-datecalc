@@ -405,6 +405,13 @@ Currently supported calculations:
 =back
 
 
+=head1 METHODS
+
+=head2 new
+
+=head2 eval
+
+
 =head1 TODO
 
 Support more special date literals: {last,next} {week,month,year,...}, etc.
