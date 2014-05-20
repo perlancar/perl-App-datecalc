@@ -27,19 +27,47 @@ while ( defined ($_ = $term->readline($prompt)) ) {
     $term->addhistory($_) if /\S/;
 }
 
-# ABSTRACT: Date arithmetics
+# ABSTRACT: Date calculations
 # PODNAME: datecalc
 
 =head1 SYNOPSIS
 
  % datecalc
- > 2014-05-13 + 2 days
+
+ > today
+ 2014-05-13
+
+ > tomorrow
+ 2014-05-14
+
+ > today + 2 days
  2014-05-15
+
+ > 2014-05-13 - 2014-02-14
+ P2M3W6D
+
+ > 2 months 3 weeks 6 days
+ P2M3W6D
+
+ > P10D
+ P1W3D
+
+ > 2014-05-13 + P2D
+ 2014-05-15
+
+ > 2 * 2 days 10 hours
+ P4DT20H
+
+ > P10D / 2
+ P5D
+
+ > 6d + 8d + 13 min
+ P2WT13M
 
 
 =head1 DESCRIPTION
 
-This is a command-line utility to perform date arithmetics.
+This is a command-line utility to perform date calculations.
 
 For now, for more details, see L<App::datecalc>.
 

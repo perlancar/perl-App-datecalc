@@ -195,6 +195,7 @@ _
         actions => {
             date_parenthesis => sub {
                 my $h = shift;
+                $_[0];
             },
             datelit_isodate => sub {
                 my $h = shift;
@@ -351,6 +352,8 @@ Currently supported calculations:
  today
  tomorrow
 
+=item * (NOT YET) time and date-time literals
+
 =item * duration literals, either in ISO 8601 format or natural syntax
 
  P3M2D
@@ -379,33 +382,33 @@ Currently supported calculations:
  year(2014-05-20)
  month(2014-05-20)
  day(2014-05-20)
+ dow(today)
 
 =item * (NOT YET) extract elements from duration
+
+ weeks(P22D)
 
 =item * (NOT YET) some simple number arithmetics
 
  2*4
  2*4 days 1+1 hours
 
+=item * (NOT YET) date comparison
+
+ today >= 2014-05-20
+
+=item * (NOT YET) duration comparison
+
+ P20D < P3W
+
 =back
 
 
 =head1 TODO
 
-Support date+time literal.
-
-Support time literal (but can we represent it in DateTime?).
-
-Function to extract elements, e.g. hour(dt), month(dt).
-
 Support more special date literals: {last,next} {week,month,year,...}, etc.
 
-Comparison (date1 < date2, d1 <=> d2, ...).
-
 Variable assignment?
-
-Numeric calculations, so the tool is usable too for some simple arithmetics,
-e.g. hour(dt)*2.
 
 
 =head1 SEE ALSO
