@@ -47,19 +47,26 @@ lexeme default         = latm=>1
 
 answer               ::= date_expr
                        | dur_expr
-#                      | num_expr
+                       | num_expr
+
+num_expr             ::= num_add
+num_add              ::= num_mult
+                       | num_add op_addsub num_add                        action=>num_add
+num_mult             ::= num_pow
+                       | num_mult op_multdiv num_mult                     action=>num_mult
+num_pow              ::= num_term
+                      || num_pow '**' num_pow                             action=>num_pow assoc=>right
+num_term             ::= num_literal
+                       | ('(') num_expr (')')
 
 date_expr            ::= date_sub_date
-
 date_sub_date        ::= date_add_dur
                        | date_sub_date '-' date_sub_date                  action=>date_sub_date
-
 date_add_dur         ::= date_term
-                       | date_add_dur op_plusminus dur_term               action=>date_add_dur
-
+                       | date_add_dur op_addsub dur_term                  action=>date_add_dur
 date_term            ::= date_literal
 #                       | date_variable
-                       | ('(') date_expr (')')                            action=>date_parenthesis
+                       | ('(') date_expr (')')
 
 year                   ~ [\d][\d][\d][\d]
 mon2                   ~ [\d][\d]
@@ -71,22 +78,15 @@ date_literal         ::= year ('-') mon2 ('-') day                        action
                        | 'tomorrow'                                       action=>datelit_special
 
 dur_expr             ::= dur_add_dur
-
 dur_add_dur          ::= dur_mult_num
-                       | dur_add_dur op_plusminus dur_add_dur             action=>dur_add_dur
+                       | dur_add_dur op_addsub dur_add_dur                action=>dur_add_dur
 
-# can't use num directly because marpa will complain 'A lexeme in G1 is not a
-# lexeme in any of the lexers'. since num appears in RHS in L0 rules, it's not
-# considered a lexeme.
-num_opn                ~ num
 dur_mult_num         ::= dur_term
-                       | dur_mult_num op_multdiv num_opn                  action=>dur_mult_num
-                       | num_opn op_mult dur_mult_num                     action=>dur_mult_num
-
+                       | dur_mult_num op_multdiv num_expr                 action=>dur_mult_num
+                       | num_expr op_mult dur_mult_num                    action=>dur_mult_num
 dur_term             ::= dur_literal
 #                       | dur_variable
                        | '(' dur_expr ')'
-
 dur_literal          ::= nat_dur_literal
                        | iso_dur_literal
 
@@ -176,6 +176,7 @@ iso_dur_literal0       ~ 'P' idl_year     idl_month_opt idl_week_opt idl_day_opt
 
 sign                   ~ [+-]
 digits                 ~ [\d]+
+num_literal            ~ num
 num                    ~ digits
                        | sign digits
                        | digits '.' digits
@@ -183,7 +184,10 @@ num                    ~ digits
 posnum                 ~ digits
                        | digits '.' digits
 
-op_plusminus           ~ [+-]
+#op_addsub              ~ [+-]
+#TMP
+op_addsub              ~ [+] | ' - '
+
 op_mult                ~ [*]
 op_multdiv             ~ [*/]
 
@@ -193,10 +197,6 @@ ws_opt                 ~ [\s]*
 
 _
         actions => {
-            date_parenthesis => sub {
-                my $h = shift;
-                $_[0];
-            },
             datelit_isodate => sub {
                 my $h = shift;
                 DateTime->new(year=>$_[0], month=>$_[1], day=>$_[2]);
@@ -301,6 +301,26 @@ _
                 $params{seconds} = $1 if $t =~ /(-?\d+(?:\.\d+)?)S/i;
                 DateTime::Duration->new(%params);
             },
+            num_add => sub {
+                my $h = shift;
+                if ($_[1] eq '+') {
+                    $_[0] + $_[2];
+                } else {
+                    $_[0] - $_[2];
+                }
+            },
+            num_mult => sub {
+                my $h = shift;
+                if ($_[1] eq '*') {
+                    $_[0] * $_[2];
+                } else {
+                    $_[0] / $_[2];
+                }
+            },
+            num_pow => sub {
+                my $h = shift;
+                $_[0] ** $_[2];
+            },
         },
         trace_terminals => $ENV{DEBUG},
         trace_values => $ENV{DEBUG},
@@ -389,10 +409,10 @@ Currently supported calculations:
 
  weeks(P22D)
 
-=item * (NOT YET) some simple number arithmetics
+=item * some simple number arithmetics
 
- 2*4
- 2*4 days 1+1 hours
+ 3+4.5
+ 2**3 * P1D
 
 =item * (NOT YET) date comparison
 
