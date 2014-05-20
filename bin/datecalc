@@ -5,27 +5,58 @@ use strict;
 use warnings;
 
 use App::datecalc;
+use Getopt::Long;
 use Term::ReadLine;
 
 # VERSION
 # DATE
 
-my $calc = App::datecalc->new;
+sub get_options {
+    my %opts;
+    GetOptions(
+        '--help|h|?', \$opts{help},
+        '--version|v', \$opts{version},
 
-my $term = Term::ReadLine->new('datecalc');
-my $prompt = "> ";
-my $OUT = $term->OUT || \*STDOUT;
+    );
 
-while ( defined ($_ = $term->readline($prompt)) ) {
-    my $res;
-    eval { $res = $calc->eval($_) };
-    if ($@) {
-        warn "Error: $@\n";
-    } else {
-        print $OUT $res, "\n";
+    if ($opts{help}) {
+        print <<_;
+Usage:
+  datecalc [OPTIONS]
+
+Options:
+  --help, -h, -?
+  --version, -v
+_
+        exit 0;
+    } elsif ($opts{version}) {
+        say "datecalc version $::VERSION";
+        exit 0;
     }
-    $term->addhistory($_) if /\S/;
 }
+
+sub eval_loop {
+    my $calc = App::datecalc->new;
+    my $term = Term::ReadLine->new('datecalc');
+    my $prompt = "> ";
+    my $OUT = $term->OUT || \*STDOUT;
+
+    while ( defined ($_ = $term->readline($prompt)) ) {
+        my $res;
+        eval { $res = $calc->eval($_) };
+        if ($@) {
+            warn "Error: $@\n";
+        } else {
+            print $OUT $res, "\n";
+        }
+        $term->addhistory($_) if /\S/;
+    }
+}
+
+### main
+
+get_options();
+eval_loop();
 
 # ABSTRACT: Date calculations
 # PODNAME: datecalc
