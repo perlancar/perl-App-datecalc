@@ -52,7 +52,7 @@ answer               ::= date_expr
 date_expr            ::= date_sub_date
 
 date_sub_date        ::= date_add_dur
-                       | date_sub_date ('-') date_sub_date                action=>date_sub_date
+                       | date_sub_date '-' date_sub_date                  action=>date_sub_date
 
 date_add_dur         ::= date_term
                        | date_add_dur op_plusminus dur_term               action=>date_add_dur
@@ -75,8 +75,13 @@ dur_expr             ::= dur_add_dur
 dur_add_dur          ::= dur_mult_num
                        | dur_add_dur op_plusminus dur_add_dur             action=>dur_add_dur
 
+# can't use num directly because marpa will complain 'A lexeme in G1 is not a
+# lexeme in any of the lexers'. since num appears in RHS in L0 rules, it's not
+# considered a lexeme.
+num_opn                ~ num
 dur_mult_num         ::= dur_term
-                       | dur_mult_num op_multdiv
+                       | dur_mult_num op_multdiv num_opn                  action=>dur_mult_num
+                       | num_opn op_mult dur_mult_num                     action=>dur_mult_num
 
 dur_term             ::= dur_literal
 #                       | dur_variable
@@ -179,6 +184,7 @@ posnum                 ~ digits
                        | digits '.' digits
 
 op_plusminus           ~ [+-]
+op_mult                ~ [*]
 op_multdiv             ~ [*/]
 
 :discard               ~ ws
@@ -196,7 +202,7 @@ _
             },
             date_sub_date => sub {
                 my $h = shift;
-                $_[0]->subtract_datetime($_[1]);
+                $_[0]->subtract_datetime($_[2]);
             },
             datelit_special => sub {
                 my $h = shift;
@@ -222,7 +228,48 @@ _
             },
             dur_add_dur => sub {
                 my $h = shift;
-                dd \@_;
+                $_[0] + $_[2];
+            },
+            dur_mult_num => sub {
+                my $h = shift;
+                if (ref $_[0]) {
+                    my $d0 = $_[0];
+                    if ($_[1] eq '*') {
+                        # dur*num
+                        DateTime::Duration->new(
+                            years   => $d0->years   * $_[2],
+                            months  => $d0->months  * $_[2],
+                            weeks   => $d0->weeks   * $_[2],
+                            days    => $d0->days    * $_[2],
+                            hours   => $d0->hours   * $_[2],
+                            minutes => $d0->minutes * $_[2],
+                            seconds => $d0->seconds * $_[2],
+                        );
+                    } else {
+                        # dur/num
+                        DateTime::Duration->new(
+                            years   => $d0->years   / $_[2],
+                            months  => $d0->months  / $_[2],
+                            weeks   => $d0->weeks   / $_[2],
+                            days    => $d0->days    / $_[2],
+                            hours   => $d0->hours   / $_[2],
+                            minutes => $d0->minutes / $_[2],
+                            seconds => $d0->seconds / $_[2],
+                        );
+                    }
+                } else {
+                    my $d0 = $_[2];
+                    # num * dur
+                    DateTime::Duration->new(
+                        years   => $d0->years   * $_[0],
+                        months  => $d0->months  * $_[0],
+                        weeks   => $d0->weeks   * $_[0],
+                        days    => $d0->days    * $_[0],
+                        hours   => $d0->hours   * $_[0],
+                        minutes => $d0->minutes * $_[0],
+                        seconds => $d0->seconds * $_[0],
+                    );
+                }
             },
             durlit_nat => sub {
                 my $h = shift;
@@ -318,11 +365,14 @@ Currently supported calculations:
 
  2014-05-19 - 2013-12-25
 
-=item * (NOT YET) duration addition/subtraction with another duration
+=item * duration addition/subtraction with another duration
 
-=item * (NOT YET) duration multiplication/division with a number
+ 1 week 1 day + P10D
+
+=item * duration multiplication/division with a number
 
  P2D * 2
+ 2 * P2D
 
 =item * (NOT YET) extract elements from date
 
@@ -331,6 +381,11 @@ Currently supported calculations:
  day(2014-05-20)
 
 =item * (NOT YET) extract elements from duration
+
+=item * (NOT YET) some simple number arithmetics
+
+ 2*4
+ 2*4 days 1+1 hours
 
 =back
 
