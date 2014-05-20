@@ -123,13 +123,13 @@ ndl_second_opt         ~
 
 # need at least one element specified. XXX not happy with this
 nat_dur_literal      ::= nat_dur_literal0                                 action=>durlit_nat
-nat_dur_literal0       ~ ndl_year     ndl_month_opt ndl_week_opt ndl_day_opt ndl_hour_opt ndl_minute_opt ndl_second_opt
-                       | ndl_year_opt ndl_month     ndl_week_opt ndl_day_opt ndl_hour_opt ndl_minute_opt ndl_second_opt
-                       | ndl_year_opt ndl_month_opt ndl_week     ndl_day_opt ndl_hour_opt ndl_minute_opt ndl_second_opt
-                       | ndl_year_opt ndl_month_opt ndl_week_opt ndl_day     ndl_hour_opt ndl_minute_opt ndl_second_opt
-                       | ndl_year_opt ndl_month_opt ndl_week_opt ndl_day_opt ndl_hour     ndl_minute_opt ndl_second_opt
-                       | ndl_year_opt ndl_month_opt ndl_week_opt ndl_day_opt ndl_hour_opt ndl_minute     ndl_second_opt
-                       | ndl_year_opt ndl_month_opt ndl_week_opt ndl_day_opt ndl_hour_opt ndl_minute_opt ndl_second
+nat_dur_literal0       ~ ndl_year     ws_opt ndl_month_opt ws_opt ndl_week_opt ws_opt ndl_day_opt ws_opt ndl_hour_opt ws_opt ndl_minute_opt ws_opt ndl_second_opt
+                       | ndl_year_opt ws_opt ndl_month     ws_opt ndl_week_opt ws_opt ndl_day_opt ws_opt ndl_hour_opt ws_opt ndl_minute_opt ws_opt ndl_second_opt
+                       | ndl_year_opt ws_opt ndl_month_opt ws_opt ndl_week     ws_opt ndl_day_opt ws_opt ndl_hour_opt ws_opt ndl_minute_opt ws_opt ndl_second_opt
+                       | ndl_year_opt ws_opt ndl_month_opt ws_opt ndl_week_opt ws_opt ndl_day     ws_opt ndl_hour_opt ws_opt ndl_minute_opt ws_opt ndl_second_opt
+                       | ndl_year_opt ws_opt ndl_month_opt ws_opt ndl_week_opt ws_opt ndl_day_opt ws_opt ndl_hour     ws_opt ndl_minute_opt ws_opt ndl_second_opt
+                       | ndl_year_opt ws_opt ndl_month_opt ws_opt ndl_week_opt ws_opt ndl_day_opt ws_opt ndl_hour_opt ws_opt ndl_minute     ws_opt ndl_second_opt
+                       | ndl_year_opt ws_opt ndl_month_opt ws_opt ndl_week_opt ws_opt ndl_day_opt ws_opt ndl_hour_opt ws_opt ndl_minute_opt ws_opt ndl_second
 
 idl_year               ~ posnum 'Y'
 idl_year_opt           ~ posnum 'Y'
@@ -214,7 +214,6 @@ _
             },
             date_add_dur => sub {
                 my $h = shift;
-                dd \@_;
                 if ($_[1] eq '+') {
                     $_[0] + $_[2];
                 } else {
@@ -224,6 +223,34 @@ _
             dur_add_dur => sub {
                 my $h = shift;
                 dd \@_;
+            },
+            durlit_nat => sub {
+                my $h = shift;
+                local $_ = $_[0];
+                my %params;
+                $params{years} = $1 if /(-?\d+(?:\.\d+)?)\s*(years?|y)/;
+                $params{months} = $1 if /(-?\d+(?:\.\d+)?)\s*(mons?|months?)/;
+                $params{weeks} = $1 if /(-?\d+(?:\.\d+)?)\s*(weeks?|w)/;
+                $params{days} = $1 if /(-?\d+(?:\.\d+)?)\s*(days?|d)/;
+                $params{hours} = $1 if /(-?\d+(?:\.\d+)?)\s*(hours?|h)/;
+                $params{minutes} = $1 if /(-?\d+(?:\.\d+)?)\s*(mins?|minutes?)/;
+                $params{seconds} = $1 if /(-?\d+(?:\.\d+)?)\s*(secs?|seconds?)/;
+                DateTime::Duration->new(%params);
+            },
+            durlit_iso => sub {
+                my $h = shift;
+                # split between date and time
+                my $d = $_[0] =~ /P(.+)(?:T|\z)/ ? $1 : '';
+                my $t = $_[0] =~ /T(.*)/ ? $1 : '';
+                my %params;
+                $params{years} = $1 if $d =~ /(-?\d+(?:\.\d+)?)Y/i;
+                $params{months} = $1 if $d =~ /(-?\d+(?:\.\d+)?)M/i;
+                $params{weeks} = $1 if $d =~ /(-?\d+(?:\.\d+)?)W/;
+                $params{days} = $1 if $d =~ /(-?\d+(?:\.\d+)?)D/;
+                $params{hours} = $1 if $t =~ /(-?\d+(?:\.\d+)?)H/i;
+                $params{minutes} = $1 if $t =~ /(-?\d+(?:\.\d+)?)M/i;
+                $params{seconds} = $1 if $t =~ /(-?\d+(?:\.\d+)?)S/i;
+                DateTime::Duration->new(%params);
             },
         },
         trace_terminals => $ENV{DEBUG},
@@ -262,9 +289,9 @@ B<This is an early release. More features and documentation will follow in
 subsequent releases.>
 
 This module provides a date calculator. You can write date literals in ISO 8601
-format (though not all format is supported), e.g. C<2014-05-13>. Date duration
-can be specified using the natural syntax e.g. C<2 days 13 hours> or using the
-ISO 8601 format e.g. C<P2DT13H>.
+format (though not all format variants are supported), e.g. C<2014-05-13>. Date
+duration can be specified using the natural syntax e.g. C<2 days 13 hours> or
+using the ISO 8601 format e.g. C<P2DT13H>.
 
 Currently supported calculations:
 
