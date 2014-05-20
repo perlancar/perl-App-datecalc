@@ -282,14 +282,15 @@ _
                 $params{days} = $1 if /(-?\d+(?:\.\d+)?)\s*(days?|d)/;
                 $params{hours} = $1 if /(-?\d+(?:\.\d+)?)\s*(hours?|h)/;
                 $params{minutes} = $1 if /(-?\d+(?:\.\d+)?)\s*(mins?|minutes?)/;
-                $params{seconds} = $1 if /(-?\d+(?:\.\d+)?)\s*(secs?|seconds?)/;
+                $params{seconds} = $1 if /(-?\d+(?:\.\d+)?)\s*(s|secs?|seconds?)/;
                 DateTime::Duration->new(%params);
             },
             durlit_iso => sub {
                 my $h = shift;
                 # split between date and time
-                my $d = $_[0] =~ /P(.+)(?:T|\z)/ ? $1 : '';
+                my $d = $_[0] =~ /P(.+?)(?:T|\z)/ ? $1 : '';
                 my $t = $_[0] =~ /T(.*)/ ? $1 : '';
+                #say "D = $d, T = $t";
                 my %params;
                 $params{years} = $1 if $d =~ /(-?\d+(?:\.\d+)?)Y/i;
                 $params{months} = $1 if $d =~ /(-?\d+(?:\.\d+)?)M/i;
