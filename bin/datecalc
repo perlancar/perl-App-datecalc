@@ -58,7 +58,7 @@ sub eval_loop {
 get_options();
 eval_loop();
 
-# ABSTRACT: Date calculations
+# ABSTRACT: Date calculator
 # PODNAME: datecalc
 
 =head1 SYNOPSIS

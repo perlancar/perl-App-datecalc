@@ -68,7 +68,7 @@ date_term            ::= date_literal
 #                       | date_variable
                        | ('(') date_expr (')')
 
-date_literal         ::= iso_date                        action=>datelit_isodate
+date_literal         ::= iso_date_literal                                 action=>datelit_iso
                        | 'now'                                            action=>datelit_special
                        | 'today'                                          action=>datelit_special
                        | 'yesterday'                                      action=>datelit_special
@@ -77,7 +77,7 @@ date_literal         ::= iso_date                        action=>datelit_isodate
 year                   ~ [\d][\d][\d][\d]
 mon2                   ~ [\d][\d]
 day                    ~ [\d][\d]
-iso_date         ~ year '-' mon2 '-' day
+iso_date_literal       ~ year '-' mon2 '-' day
 
 dur_expr             ::= dur_add_dur
 dur_add_dur          ::= dur_mult_num
@@ -199,9 +199,9 @@ ws_opt                 ~ [\s]*
 
 _
         actions => {
-            datelit_isodate => sub {
-                my (undef, $h) = @_;
-		my @date = split m/[-]/, $h;
+            datelit_iso => sub {
+                my $h = shift;
+		my @date = split /-/, $_[0];
                 DateTime->new(year=>$date[0], month=>$date[1], day=>$date[2]);
             },
             date_sub_date => sub {
@@ -346,7 +346,7 @@ sub eval {
 }
 
 1;
-#ABSTRACT: Date calculations
+#ABSTRACT: Date calculator
 
 =head1 SYNOPSIS
 
@@ -360,10 +360,10 @@ sub eval {
 B<This is an early release. More features and documentation will follow in
 subsequent releases.>
 
-This module provides a date calculator. You can write date literals in ISO 8601
-format (though not all format variants are supported), e.g. C<2014-05-13>. Date
-duration can be specified using the natural syntax e.g. C<2 days 13 hours> or
-using the ISO 8601 format e.g. C<P2DT13H>.
+This module provides a date calculator, for doing date-related calculations. You
+can write date literals in ISO 8601 format (though not all format variants are
+supported), e.g. C<2014-05-13>. Date duration can be specified using the natural
+syntax e.g. C<2 days 13 hours> or using the ISO 8601 format e.g. C<P2DT13H>.
 
 Currently supported calculations:
 
