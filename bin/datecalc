@@ -3,17 +3,16 @@
 use 5.010;
 use strict;
 use warnings;
-
-use App::datecalc;
-use Getopt::Long;
-use Term::ReadLine;
+#use Log::Any '$log';
 
 # VERSION
 # DATE
 
 sub get_options {
+    require Getopt::Long;
+
     my %opts;
-    GetOptions(
+    Getopt::Long::GetOptions(
         '--help|h|?', \$opts{help},
         '--version|v', \$opts{version},
 
@@ -36,10 +35,65 @@ _
 }
 
 sub eval_loop {
+    require App::datecalc;
+    require File::HomeDir;
+    require IO::Stty;
+    require Term::ReadLine;
+
     my $calc = App::datecalc->new;
     my $term = Term::ReadLine->new('datecalc');
     my $prompt = "> ";
     my $OUT = $term->OUT || \*STDOUT;
+
+    my $histfile = File::HomeDir->my_home . "/.datecalc_history";
+
+    # load history from file
+    if ($term->Features->{setHistory} && (-r $histfile)) {
+        #$log->tracef("Loading history from %s ...", $histfile);
+        open(my $fh, '<', $histfile)
+            or die "Can't open history file $histfile: $!\n";
+        chomp(my @history = <$fh>);
+        $term->SetHistory(@history);
+    }
+
+    my $sub_save_hist = sub {
+        if ($term->Features->{getHistory}) {
+            my $fh;
+            if (open $fh, ">", $histfile) {
+                use Data::Dump;
+                dd [$term->GetHistory];
+                print $fh "$_\n" for grep { length } $term->GetHistory;
+            }
+        }
+    };
+
+    local $SIG{INT} = sub {
+        # save history when we are interrupted
+        $sub_save_hist->();
+        print STDERR "Interrupted\n";
+        if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
+            IO::Stty::stty(\*STDIN, 'echo');
+        }
+        exit 1;
+    };
+
+    #local $SIG{__DIE__} = sub {
+    #    IO::Stty::stty(\*STDIN, 'echo');
+    #    die @_;
+    #};
+
+    # some workaround for Term::ReadLine
+    my $attribs = $term->Attribs;
+    if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
+        # TR::Gnu traps our INT handler
+        # ref: http://www.perlmonks.org/?node_id=1003497
+        $attribs->{catch_signals} = 0;
+    } elsif ($term->ReadLine eq 'Term::ReadLine::Perl') {
+        # TR::Perl messes up colors
+        # doesn't do anything?
+        #$term->ornaments(0);
+        #$attribs->{term_set} = ["", "", "", ""];
+    }
 
     while ( defined ($_ = $term->readline($prompt)) ) {
         my $res;
@@ -49,8 +103,11 @@ sub eval_loop {
         } else {
             print $OUT $res, "\n";
         }
-        $term->addhistory($_) if /\S/;
+        # double?
+        #$term->addhistory($_) if /\S/;
     }
+
+    $sub_save_hist->();
 }
 
 ### main
