@@ -62,8 +62,9 @@ sub eval_loop {
             my $fh;
             if (open $fh, ">", $histfile) {
                 print $fh "$_\n" for
-                    map { SHARYANTO::List::Util::uniq($_) }
-                        grep { length } $term->GetHistory;
+                    SHARYANTO::List::Util::uniq(
+                        grep { length } $term->GetHistory
+                    );
             }
         }
     };
