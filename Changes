@@ -1,5 +1,14 @@
 Revision history for App-datecalc
 
+0.02    2014-05-21 (SHARYANTO)
+
+        - Numeric arithmetics.
+
+        - Date and duration functions (e.g. month(today), years(33 months)).
+
+        - Save and load history (~/.datecalc_history).
+
+
 0.01    2014-05-20 (SHARYANTO)
 
         - First release.
