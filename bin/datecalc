@@ -60,8 +60,6 @@ sub eval_loop {
         if ($term->Features->{getHistory}) {
             my $fh;
             if (open $fh, ">", $histfile) {
-                use Data::Dump;
-                dd [$term->GetHistory];
                 print $fh "$_\n" for grep { length } $term->GetHistory;
             }
         }
@@ -158,4 +156,9 @@ eval_loop();
 This is a command-line utility to perform date calculations.
 
 For now, for more details, see L<App::datecalc>.
+
+
+=head1 FILES
+
+=head2 ~/.datecalc_history
 
