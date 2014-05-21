@@ -154,6 +154,16 @@ eval_loop();
  > 6d + 8d + 13 min
  P2WT13M
 
+ > month(today)
+ 5
+
+ > days(P8D)
+ 1
+ > weeks(P8D)
+ 1
+ > P8D
+ P1W1D
+
 
 =head1 DESCRIPTION
 
