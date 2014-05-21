@@ -74,10 +74,10 @@ date_literal         ::= iso_date_literal                                 action
                        | 'yesterday'                                      action=>datelit_special
                        | 'tomorrow'                                       action=>datelit_special
 
-year                   ~ [\d][\d][\d][\d]
+year4                  ~ [\d][\d][\d][\d]
 mon2                   ~ [\d][\d]
-day                    ~ [\d][\d]
-iso_date_literal       ~ year '-' mon2 '-' day
+day2                   ~ [\d][\d]
+iso_date_literal       ~ year4 '-' mon2 '-' day2
 
 dur_expr             ::= dur_add_dur
 dur_add_dur          ::= dur_mult_num
