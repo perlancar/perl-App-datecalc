@@ -68,14 +68,16 @@ date_term            ::= date_literal
 #                       | date_variable
                        | ('(') date_expr (')')
 
-year                   ~ [\d][\d][\d][\d]
-mon2                   ~ [\d][\d]
-day                    ~ [\d][\d]
-date_literal         ::= year ('-') mon2 ('-') day                        action=>datelit_isodate
+date_literal         ::= iso_date                        action=>datelit_isodate
                        | 'now'                                            action=>datelit_special
                        | 'today'                                          action=>datelit_special
                        | 'yesterday'                                      action=>datelit_special
                        | 'tomorrow'                                       action=>datelit_special
+
+year                   ~ [\d][\d][\d][\d]
+mon2                   ~ [\d][\d]
+day                    ~ [\d][\d]
+iso_date         ~ year '-' mon2 '-' day
 
 dur_expr             ::= dur_add_dur
 dur_add_dur          ::= dur_mult_num
@@ -198,8 +200,9 @@ ws_opt                 ~ [\s]*
 _
         actions => {
             datelit_isodate => sub {
-                my $h = shift;
-                DateTime->new(year=>$_[0], month=>$_[1], day=>$_[2]);
+                my (undef, $h) = @_;
+		my @date = split m/[-]/, $h;
+                DateTime->new(year=>$date[0], month=>$date[1], day=>$date[2]);
             },
             date_sub_date => sub {
                 my $h = shift;
