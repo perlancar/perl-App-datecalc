@@ -56,7 +56,10 @@ subtest 'duration multiplication/division with number' => sub {
 
 subtest 'number arithmetics' => sub {
     is($calc->eval('2+3'), '5');
-    is($calc->eval('4 - 5'), '-1');
+    is($calc->eval('1*2*3*4*5'), '120');
+    is($calc->eval('7/2'), '3.5');
+    is($calc->eval('2**2**3'), '256');
+    is($calc->eval('4-5'), '-1');
     is($calc->eval('2*3 * P1D'), 'P6D');
 };
 

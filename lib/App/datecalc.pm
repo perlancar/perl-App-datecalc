@@ -186,9 +186,7 @@ num                    ~ digits
 posnum                 ~ digits
                        | digits '.' digits
 
-#op_addsub              ~ [+-]
-#TMP
-op_addsub              ~ [+] | ' - '
+op_addsub              ~ [+-]
 
 op_mult                ~ [*]
 op_multdiv             ~ [*/]
