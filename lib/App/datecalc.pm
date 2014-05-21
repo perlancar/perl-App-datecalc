@@ -47,6 +47,7 @@ lexeme default         = latm=>1
 
 answer               ::= date_expr
                        | dur_expr
+#                       | str_expr
                        | num_expr
 
 num_expr             ::= num_add
@@ -57,6 +58,8 @@ num_mult             ::= num_pow
 num_pow              ::= num_term
                       || num_pow '**' num_pow                             action=>num_pow assoc=>right
 num_term             ::= num_literal
+                       | func_idate_onum
+                       | func_idur_onum
                        | ('(') num_expr (')')
 
 date_expr            ::= date_sub_date
@@ -66,7 +69,17 @@ date_add_dur         ::= date_term
                        | date_add_dur op_addsub dur_term                  action=>date_add_dur
 date_term            ::= date_literal
 #                       | date_variable
+#                       | func_idate_odate
                        | ('(') date_expr (')')
+
+func_idate_onum_names  ~ 'year' | 'month' | 'day' | 'dow' | 'quarter'
+                       | 'doy' | 'wom' | 'woy' | 'doq'
+                       | 'hour' | 'minute' | 'second'
+func_idate_onum      ::= func_idate_onum_names ('(') date_expr (')')      action=>func_idate_onum
+
+func_idur_onum_names   ~ 'years' | 'months' | 'weeks' | 'days'
+                       | 'hours' | 'minutes' | 'seconds'
+func_idur_onum       ::= func_idur_onum_names ('(') dur_expr (')')        action=>func_idur_onum
 
 date_literal         ::= iso_date_literal                                 action=>datelit_iso
                        | 'now'                                            action=>datelit_special
@@ -302,6 +315,60 @@ _
                 $params{seconds} = $1 if $t =~ /(-?\d+(?:\.\d+)?)S/i;
                 DateTime::Duration->new(%params);
             },
+            func_idate_onum => sub {
+                my $h = shift;
+                my $fn = $_[0];
+                my $d = $_[1];
+                if ($fn eq 'year') {
+                    $d->year;
+                } elsif ($fn eq 'month') {
+                    $d->month;
+                } elsif ($fn eq 'day') {
+                    $d->day;
+                } elsif ($fn eq 'dow') {
+                    $d->day_of_week;
+                } elsif ($fn eq 'quarter') {
+                    $d->quarter;
+                } elsif ($fn eq 'doy') {
+                    $d->day_of_year;
+                } elsif ($fn eq 'wom') {
+                    $d->week_of_month;
+                } elsif ($fn eq 'woy') {
+                    $d->week_number;
+                } elsif ($fn eq 'doq') {
+                    $d->day_of_quarter;
+                } elsif ($fn eq 'hour') {
+                    $d->hour;
+                } elsif ($fn eq 'minute') {
+                    $d->minute;
+                } elsif ($fn eq 'second') {
+                    $d->second;
+                } else {
+                    die "BUG: Unknown date function $fn";
+                }
+            },
+            func_idur_onum => sub {
+                my $h = shift;
+                my $fn = $_[0];
+                my $dur = $_[1];
+                if ($fn eq 'years') {
+                    $dur->years;
+                } elsif ($fn eq 'months') {
+                    $dur->months;
+                } elsif ($fn eq 'weeks') {
+                    $dur->weeks;
+                } elsif ($fn eq 'days') {
+                    $dur->days;
+                } elsif ($fn eq 'hours') {
+                    $dur->hours;
+                } elsif ($fn eq 'minutes') {
+                    $dur->minutes;
+                } elsif ($fn eq 'seconds') {
+                    $dur->seconds;
+                } else {
+                    die "BUG: Unknown duration function $fn";
+                }
+            },
             num_add => sub {
                 my $h = shift;
                 if ($_[1] eq '+') {
@@ -399,16 +466,30 @@ Currently supported calculations:
  P2D * 2
  2 * P2D
 
-=item * (NOT YET) extract elements from date
+=item * extract elements from date
 
  year(2014-05-20)
- month(2014-05-20)
- day(2014-05-20)
+ quarter(today)
+ month(today)
+ day(today)
  dow(today)
+ doy(today)
+ doq(today)
+ wom(today)
+ woy(today)
+ hour(today)
+ minute(today)
+ second(today)
 
-=item * (NOT YET) extract elements from duration
+=item * extract elements from duration
 
+ years(P22D)
+ months(P22D)
  weeks(P22D)
+ days(P22D)
+ hours(P22D)
+ minutes(P22D)
+ seconds(P22D)
 
 =item * some simple number arithmetics
 
