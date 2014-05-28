@@ -65,9 +65,7 @@ num_term             ::= num_literal
                        | func_idur_onum
                        | ('(') num_expr (')')
 
-date_expr            ::= date_sub_date
-date_sub_date        ::= date_add_dur
-                       | date_sub_date '-' date_sub_date                  action=>date_sub_date
+date_expr            ::= date_add_dur
 date_add_dur         ::= date_term
                        | date_add_dur op_addsub dur_term                  action=>date_add_dur
 date_term            ::= date_literal
@@ -100,8 +98,11 @@ day2                   ~ [\d][\d]
 iso_date_literal       ~ year4 '-' mon2 '-' day2
 
 dur_expr             ::= dur_add_dur
+                       | date_sub_date
 dur_add_dur          ::= dur_mult_num
                        | dur_add_dur op_addsub dur_add_dur                action=>dur_add_dur
+date_sub_date        ::= date_add_dur
+                       | date_sub_date '-' date_sub_date                  action=>date_sub_date
 
 dur_mult_num         ::= dur_term
                        | dur_mult_num op_multdiv num_expr                 action=>dur_mult_num
