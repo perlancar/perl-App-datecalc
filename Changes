@@ -1,5 +1,25 @@
 Revision history for App-datecalc
 
+0.03    2014-05-28 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - [grammar] D1-D2 is a duration, not a date.
+
+        - Use delta_days() to calculate D1-D2, not subtract_datetime(). The
+          former results in exact number of days (e.g. P4W4D instead of P1M1D).
+
+        [ENHANCEMENTS]
+
+        - Support numeric operator +, -.
+
+        - Support numeric functions abs(), round().
+
+        [DOCUMENTATION]
+
+        - Add more examples in Synopsis.
+
+
 0.02    2014-05-21 (SHARYANTO)
 
         - Numeric arithmetics.
