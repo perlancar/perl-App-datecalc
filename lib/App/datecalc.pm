@@ -79,6 +79,7 @@ func_idate_onum      ::= func_idate_onum_names ('(') date_expr (')')      action
 
 func_idur_onum_names   ~ 'years' | 'months' | 'weeks' | 'days'
                        | 'hours' | 'minutes' | 'seconds'
+                       | 'totdays'
 func_idur_onum       ::= func_idur_onum_names ('(') dur_expr (')')        action=>func_idur_onum
 
 date_literal         ::= iso_date_literal                                 action=>datelit_iso
@@ -359,6 +360,8 @@ _
                     $dur->weeks;
                 } elsif ($fn eq 'days') {
                     $dur->days;
+                } elsif ($fn eq 'totdays') {
+                    $dur->in_units("days");
                 } elsif ($fn eq 'hours') {
                     $dur->hours;
                 } elsif ($fn eq 'minutes') {
@@ -486,7 +489,10 @@ Currently supported calculations:
  years(P22D)
  months(P22D)
  weeks(P22D)
- days(P22D)
+ days(P22D)       # 1, because P22D normalizes to P3W1D
+ totdays(P22D)    # 22
+ days(P1M1D       # 1
+ totdays(P1M1D    # 1, because months cannot be converted to days
  hours(P22D)
  minutes(P22D)
  seconds(P22D)

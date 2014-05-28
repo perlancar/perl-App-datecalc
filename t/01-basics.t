@@ -84,6 +84,7 @@ subtest 'duration functions' => sub {
     is($calc->eval('months(P2Y13M)'), 1);
     is($calc->eval('weeks(P7D)'), 1);
     is($calc->eval('days(P8D)'), 1);
+    is($calc->eval('totdays(P8D)'), 8);
 
     is($calc->eval('hours(PT8H)'), 8);
     is($calc->eval('minutes(PT13M)'), 13);
