@@ -217,7 +217,7 @@ _
             },
             date_sub_date => sub {
                 my $h = shift;
-                $_[0]->subtract_datetime($_[2]);
+                $_[0]->delta_days($_[2]);
             },
             datelit_special => sub {
                 my $h = shift;
