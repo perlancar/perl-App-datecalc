@@ -58,6 +58,7 @@ num_mult             ::= num_pow
 num_pow              ::= num_term
                       || num_pow '**' num_pow                             action=>num_pow assoc=>right
 num_term             ::= num_literal
+                       | func_inum_onum
                        | func_idate_onum
                        | func_idur_onum
                        | ('(') num_expr (')')
@@ -71,6 +72,9 @@ date_term            ::= date_literal
 #                       | date_variable
 #                       | func_idate_odate
                        | ('(') date_expr (')')
+
+func_inum_onum_names   ~ 'abs' | 'round'
+func_inum_onum       ::= func_inum_onum_names ('(') num_expr (')')        action=>func_inum_onum
 
 func_idate_onum_names  ~ 'year' | 'month' | 'day' | 'dow' | 'quarter'
                        | 'doy' | 'wom' | 'woy' | 'doq'
@@ -316,6 +320,18 @@ _
                 $params{seconds} = $1 if $t =~ /(-?\d+(?:\.\d+)?)S/i;
                 DateTime::Duration->new(%params);
             },
+            func_inum_onum => sub {
+                my $h = shift;
+                my $fn = $_[0];
+                my $num = $_[1];
+                if ($fn eq 'abs') {
+                    abs($num);
+                } elsif ($fn eq 'round') {
+                    sprintf("%.0f", $num);
+                } else {
+                    die "BUG: Unknown number function $fn";
+                }
+            },
             func_idate_onum => sub {
                 my $h = shift;
                 my $fn = $_[0];
@@ -501,6 +517,8 @@ Currently supported calculations:
 
  3+4.5
  2**3 * P1D
+ abs(2-5)         # 3
+ round(1.6+3)     # 5
 
 =item * (NOT YET) date comparison
 

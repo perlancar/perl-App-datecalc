@@ -63,6 +63,11 @@ subtest 'number arithmetics' => sub {
     is($calc->eval('2*3 * P1D'), 'P6D');
 };
 
+subtest 'numeric functions' => sub {
+    is($calc->eval('abs(-1)'), 1);
+    is($calc->eval('round(1.2)'), 1);
+    is($calc->eval('round(1.6)'), 2);
+};
 subtest 'date functions' => sub {
     is($calc->eval('year(2014-05-21)'), 2014);
     is($calc->eval('month(2014-05-21)'), 5);
