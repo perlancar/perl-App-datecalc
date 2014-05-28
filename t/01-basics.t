@@ -41,7 +41,7 @@ subtest 'date addition/subtraction with duration' => sub {
 };
 
 subtest 'date subtraction with date' => sub {
-    is($calc->eval('2014-05-20 - 2014-03-03'), 'P2M2W3D');
+    is($calc->eval('2014-05-20 - 2014-03-03'), 'P11W1D');
 };
 
 subtest 'duration addition/subtraction with duration' => sub {
