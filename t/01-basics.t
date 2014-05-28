@@ -61,6 +61,7 @@ subtest 'number arithmetics' => sub {
     is($calc->eval('2**2**3'), '256');
     is($calc->eval('4-5'), '-1');
     is($calc->eval('2*3 * P1D'), 'P6D');
+    is($calc->eval('+-+5'), '-5');
 };
 
 subtest 'numeric functions' => sub {

@@ -53,8 +53,10 @@ answer               ::= date_expr
 num_expr             ::= num_add
 num_add              ::= num_mult
                        | num_add op_addsub num_add                        action=>num_add
-num_mult             ::= num_pow
+num_mult             ::= num_unary
                        | num_mult op_multdiv num_mult                     action=>num_mult
+num_unary            ::= num_pow
+                      || op_unary num_unary                               action=>num_unary assoc=>right
 num_pow              ::= num_term
                       || num_pow '**' num_pow                             action=>num_pow assoc=>right
 num_term             ::= num_literal
@@ -204,6 +206,7 @@ num                    ~ digits
 posnum                 ~ digits
                        | digits '.' digits
 
+op_unary               ~ [+-]
 op_addsub              ~ [+-]
 
 op_mult                ~ [*]
@@ -402,6 +405,17 @@ _
                     $_[0] * $_[2];
                 } else {
                     $_[0] / $_[2];
+                }
+            },
+            num_unary => sub {
+                my $h = shift;
+                my $op = $_[0];
+                my $num = $_[1];
+                if ($op eq '+') {
+                    $num;
+                } else {
+                    # -
+                    -$num;
                 }
             },
             num_pow => sub {
