@@ -99,6 +99,14 @@ sub eval_loop {
 
     while ( defined ($_ = $term->readline($prompt)) ) {
         my $res;
+        if ($_ eq 'help' || $_ eq '?') {
+            say "Type date expression into the prompt, e.g.: 2014-06-26 + 2 week.";
+            say "For more details on available features, 'man datecalc'.";
+            say "";
+            next;
+        } elsif ($_ eq 'exit' || $_ eq 'quit') {
+            last;
+        }
         eval { $res = $calc->eval($_) };
         if ($@) {
             warn "Error: $@\n";
