@@ -522,8 +522,8 @@ Currently supported calculations:
  weeks(P22D)
  days(P22D)       # 1, because P22D normalizes to P3W1D
  totdays(P22D)    # 22
- days(P1M1D       # 1
- totdays(P1M1D    # 1, because months cannot be converted to days
+ days(P1M1D)      # 1
+ totdays(P1M1D)   # 1, because months cannot be converted to days
  hours(P22D)
  minutes(P22D)
  seconds(P22D)
