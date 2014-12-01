@@ -1,5 +1,8 @@
 package App::datecalc;
 
+# DATE
+# VERSION
+
 use 5.010001;
 use strict;
 use warnings;
@@ -8,9 +11,6 @@ use DateTime;
 use DateTime::Format::ISO8601;
 use MarpaX::Simple qw(gen_parser);
 use Scalar::Util qw(blessed);
-
-# VERSION
-# DATE
 
 # XXX there should already be an existing module that does this
 sub __fmtduriso {
@@ -438,7 +438,7 @@ sub eval {
     if (blessed($res) && $res->isa('DateTime::Duration')) {
         __fmtduriso($res);
     } elsif (blessed($res) && $res->isa('DateTime')) {
-        $res->ymd;
+        $res->ymd . "#".$res->day_abbr;
     } else {
         "$res";
     }

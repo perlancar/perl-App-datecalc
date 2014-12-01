@@ -1,12 +1,12 @@
 #!perl
 
+# DATE
+# VERSION
+
 use 5.010;
 use strict;
 use warnings;
 #use Log::Any '$log';
-
-# VERSION
-# DATE
 
 sub get_options {
     require Getopt::Long;
