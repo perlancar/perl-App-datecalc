@@ -1,5 +1,10 @@
 Revision history for App-datecalc
 
+0.05    2014-12-01 (PERLANCAR)
+
+	- [ux] Change DateTime rendering to include day of week.
+
+
 0.04    2014-06-26 (SHARYANTO)
 
         - Adjust to SHARYANTO::List::Util's 0.75 (uniq renamed to uniq_adj).

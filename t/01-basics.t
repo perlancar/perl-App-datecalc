@@ -11,12 +11,12 @@ use Test::More 0.98;
 my $calc = App::datecalc->new;
 
 subtest 'date literals' => sub {
-    is($calc->eval('2014-05-20'), '2014-05-20', 'YYYY-MM-DD');
+    like($calc->eval('2014-05-20'), qr/\A2014-05-20#/, 'YYYY-MM-DD');
     dies_ok { $calc->eval('2014-02-29') } 'invalid YYYY-MM-DD -> dies';
 
-    like($calc->eval('today'), qr/^\d{4}-\d{2}-\d{2}$/, 'today');
-    like($calc->eval('yesterday'), qr/^\d{4}-\d{2}-\d{2}$/, 'yesterday');
-    like($calc->eval('tomorrow'), qr/^\d{4}-\d{2}-\d{2}$/, 'tomorrow');
+    like($calc->eval('today'), qr/\A\d{4}-\d{2}-\d{2}#/, 'today');
+    like($calc->eval('yesterday'), qr/\A\d{4}-\d{2}-\d{2}#/, 'yesterday');
+    like($calc->eval('tomorrow'), qr/\A\d{4}-\d{2}-\d{2}#/, 'tomorrow');
 };
 
 subtest 'duration literals' => sub {
@@ -32,12 +32,12 @@ subtest 'duration literals' => sub {
 
 subtest 'datetime literals' => sub {
     # currently we don't show time
-    like($calc->eval('now'), qr/^\d{4}-\d{2}-\d{2}$/, 'now');
+    like($calc->eval('now'), qr/\A\d{4}-\d{2}-\d{2}#/, 'now');
 };
 
 subtest 'date addition/subtraction with duration' => sub {
-    is($calc->eval('2014-05-20 + 20d'), '2014-06-09');
-    is($calc->eval('2014-05-20 - P20D'), '2014-04-30');
+    like($calc->eval('2014-05-20 + 20d'), qr/\A2014-06-09#/);
+    like($calc->eval('2014-05-20 - P20D'), qr/\A2014-04-30#/);
 };
 
 subtest 'date subtraction with date' => sub {
