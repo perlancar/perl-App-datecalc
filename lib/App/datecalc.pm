@@ -555,6 +555,8 @@ Currently supported calculations:
 
 =head1 TODO
 
+Tab completion
+
 Support more special date literals: {last,next} {week,month,year,...}, etc.
 
 Variable assignment?
