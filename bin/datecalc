@@ -126,7 +126,7 @@ get_options();
 eval_loop();
 
 # ABSTRACT: Date calculator
-# PODNAME: datecalc
+# PODNAME:
 
 =head1 SYNOPSIS
 
