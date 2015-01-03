@@ -1,5 +1,12 @@
 Revision history for App-datecalc
 
+0.06    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (generate TODO.md).
+
+
 0.05    2014-12-01 (PERLANCAR)
 
 	- [ux] Change DateTime rendering to include day of week.
