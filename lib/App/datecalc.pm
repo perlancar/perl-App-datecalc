@@ -553,22 +553,6 @@ Currently supported calculations:
 =head2 eval
 
 
-=head1 TODO
-
-Tab completion
-
-Support more special date literals: {last,next} {week,month,year,...}, etc.
-
-Variable assignment?
-
-Command to print calendar? For convenience.
-
-Command to print holidays?
-
-Default format to color a date with green/red/yellow on whether it's a working
-date, a Sunday/holiday, or a joint-leave day.
-
-
 =head1 SEE ALSO
 
 L<DateTime> and L<DateTime::Format::ISO8601>, the backend modules used to do the
