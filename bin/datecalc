@@ -180,7 +180,23 @@ This is a command-line utility to perform date calculations.
 For now, for more details, see L<App::datecalc>.
 
 
+=head1 FAQ
+
+=head2 Why is date addition/subtraction with fractional duration incorrect?
+
+For example:
+
+ > 2001-01-01 + P1.5M
+ 2001-02-01#Thu
+
+One would expect something closer to C<2001-02-16>. But this is how
+L<DateTime::Duration> works. Instead of using fractions in larger units, try
+using smaller units instead. For example:
+
+ > 2001-01-01 + P1M2W
+ 2001-02-15#Thu
+
+
 =head1 FILES
 
 =head2 ~/.datecalc_history
-
