@@ -57,12 +57,12 @@ sub eval_loop {
     }
 
     my $sub_save_hist = sub {
-        require SHARYANTO::List::Util;
+        require List::Util::Uniq;
         if ($term->Features->{getHistory}) {
             my $fh;
             if (open $fh, ">", $histfile) {
                 print $fh "$_\n" for
-                    SHARYANTO::List::Util::uniq_adj(
+                    List::Util::Uniq::uniq_adj(
                         grep { length } $term->GetHistory
                     );
             }
