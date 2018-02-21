@@ -1,5 +1,7 @@
 #!perl
 
+## no critic (InputOutput::RequireBriefOpen)
+
 # DATE
 # VERSION
 
